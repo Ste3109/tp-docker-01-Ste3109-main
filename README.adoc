@@ -1,0 +1,408 @@
+:last-update-label!:
+
+== TP Docker 1 - Commandes de base
+
+=== Objectifs
+
+Cette section se concentre sur la maîtrise des commandes Docker fondamentales pour une gestion globale des conteneurs. On verra les commandes essentielles qui permettent une navigation efficace dans les environnements Docker.
+
+* Maîtrise des commandes Docker de base et leur syntaxe pour la gestion des conteneurs
+* Comprendre les fondamentaux des images Docker et leur gestion basique
+* Commandes associées : `run`, `ps`, `stop`, `start`, `restart`, `rm`, `images`, `rmi`, `pull`, `exec`, `attach`
+
+=== Méthodologie
+
+* Vous utiliserez un éditeur de texte simple pour vos réponses (pas de Google Docs ou autre format riche)
+* Vous utiliserez la https://docs.github.com/fr/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#quoting-code[syntaxe Markdown] (fichiers `.md`) ou https://docs.asciidoctor.org/asciidoc/latest/syntax-quick-reference/[Asciidoc] pour rédiger vos réponses ;
+* Pour chaque question, vous préciserez :
+** la commande utilisée (si une commande est demandée)
+** la sortie de la commande le cas échéant (ce qui s'affiche à l'écran)
+** votre réponse argumentée si nécessaire
+* La commande doit être clairement différenciée de la sortie en étant précédée d'un caractère de prompt (`$` ou `#`). Par exemple :
+
+[source,shell]
+----
+
+$ echo "ceci est la sortie de la commande"
+ceci est la sortie de la commande
+
+----
+
+* Vous utiliserez une police fixe pour formater les commandes et les sorties de commandes :
+** en Markdown, on utilise le balisage avec 3 _backticks_ (\```) suivis du langage, ici `shell` :
+[literal]
+ ```shell
+ $ docker run machin
+ sortie de la commande
+ ```
+** en Asciidoc, on utilise le balisage `[source]` :
+[literal]
+ [source,shell]
+ ----
+ $ docker run machin
+ sortie de la commande
+ ----
+
+* Vous versionerez ces fichiers-réponses avec Git et les pousserez sur un dépôt GitHub au moins une fois par séance
+
+=== Questions
+
+Rendez-vous sur https://hub.docker.com/explore pour découvrir des images Docker. Parcourez les images populaires pour vous faire une idée des possibilités « clés en main » offertes par le Docker Hub.
+
+Cherchez l'image `hello-world`. Cette image est utilisée uniquement pour tester votre installation de Docker. Elle affiche un message et se termine.
+
+*01* Lancez un conteneur Docker à partir de l'image `hello-world`. Quel message s'affiche ?
+
+[source,shell]
+----
+$ docker run hello-world
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+----
+
+''''
+
+Nous allons maintenant tester une image Linux CentOS.
+
+*02* Lancez un conteneur Docker à partir de l'image `centos`. Pourquoi le conteneur s'arrête-t-il immédiatement ?
+
+* Car c’est juste un OS et non une application. 
+
+[source,shell]
+----
+$ docker run centos
+Unable to find image 'centos:latest' locally
+latest: Pulling from library/centos
+a1d0c7532777: Download complete
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:latest
+----
+
+''''
+
+*03* Relancez le conteneur, cette fois en *mode interactif*. Vous devez obtenir un shell (ligne de commande) dans le conteneur. _Selon le shell Windows dans lequel vous exécutez la commande docker, il est possible que la commande réponde par un message d'erreur du type `the input device is not a TTY`. Dans ce cas, suivez la suggestion indiquée dans le message pour résoudre le problème._
+
+[source,shell]
+----
+$ docker run -it centos
+[root@ec8b70adc4b7 /]#
+----
+
+''''
+
+*04* En utilisant ce shell, trouvez quelle version de CentOS est utilisée (le répertoire `/etc` contient des fichiers `*release*` qui donnent des informations sur la distribution).
+
+[source,shell]
+----
+$ docker run -it centos
+[root@ec8b70adc4b7 /]# cd /etc
+[root@ec8b70adc4b7 etc]# cat centos-release
+CentOS Linux release 8.4.2105
+----
+
+''''
+
+*05* Tapez la commande pour sortir du shell (cela va automatiquement sortir du conteneur)
+
+[source,shell]
+----
+$ docker run -it centos
+[root@ec8b70adc4b7 etc]# exit
+exit
+----
+
+''''
+
+*06* Listez tous les conteneurs actifs.
+
+[source,shell]
+----
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+----
+
+''''
+
+*07* Listez tous les conteneurs, actifs ou non.
+
+[source,shell]
+----
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS                          PORTS                                        NAMES
+ec8b70adc4b7   centos         "/bin/bash"              8 minutes ago    Exited (0) About a minute ago                                                loving_vaughan
+aed795ac3847   centos         "/bin/bash"              15 minutes ago   Exited (0) 15 minutes ago                                                    reverent_mestorf
+4a660b95f8d3   hello-world    "/hello"                 18 minutes ago   Exited (0) 18 minutes ago                                                    elastic_swartz
+d26e03ff8bd1   nginx:latest   "/docker-entrypoint.…"   4 months ago     Exited (255) 20 minutes ago     80/tcp                                       tp1-web-4
+467c502c9396   nginx:latest   "/docker-entrypoint.…"   4 months ago     Exited (255) 7 days ago         80/tcp                                       tp1-web-5
+b2b8e109d7c2   nginx:latest   "/docker-entrypoint.…"   4 months ago     Exited (255) 7 days ago         80/tcp                                       tp1-web-1
+56065ce19bac   nginx:latest   "/docker-entrypoint.…"   4 months ago     Exited (255) 7 days ago         80/tcp                                       tp1-web-3
+8b6ccee6dd75   nginx:latest   "/docker-entrypoint.…"   4 months ago     Exited (255) 7 days ago         80/tcp                                       tp1-web-2
+16b2e2554ef5   traefik:v3.2   "/entrypoint.sh --ap…"   4 months ago     Exited (255) 7 days ago         0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp   tp1-reverse-proxy-1
+010fd57643c5   monsite        "/docker-entrypoint.…"   4 months ago     Exited (255) 4 months ago       0.0.0.0:32768->80/tcp                        interesting_tharp
+----
+
+''''
+
+*08* Relancez un conteneur CentOS en exécutant dessus une commande Linux qui permet d'attendre 30 secondes et se termine. Pouvez-vous travailler dans le même terminal pendant ce temps ? Justifiez.
+
+* Non car la commande demande t'attendre 30 secondes avant de pouvoir utiliser le terminal.
+
+[source,shell]
+----
+$ docker run centos:latest sleep 30
+C:\Windows\System32>
+----
+
+''''
+
+*09* Relancez la même commande mais cette fois en mode détaché. Pendant ce temps, vous lancerez la commande permettant de lister les conteneurs actifs pour vérifier que ce conteneur est bien en train de « travailler ». Patientez ensuite quelques secondes, le temps que le conteneur s'arrête. Vérifiez qu'il s'est arrêté automatiquement en listant de nouveau les conteneurs actifs.
+
+[source,shell]
+----
+$ docker run -d centos:latest sleep 30
+056d044782cd21450e95d79db28e560b366dcec8aa7e76529ce60dc8a9f9e26b
+
+C:\Windows\System32>docker ps
+CONTAINER ID   IMAGE           COMMAND      CREATED         STATUS         PORTS     NAMES
+056d044782cd   centos:latest   "sleep 30"   9 seconds ago   Up 8 seconds             jolly_vaughan
+
+C:\Windows\System32>docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+----
+
+''''
+
+*10* Relancez un conteneur CentOS pour 2000 secondes en mode détaché. Vérifiez qu'il est bien actif. Forcez l'arrêt du conteneur avant son terme automatique en utilisant les premiers caractères de son ID. Vérifiez que le conteneur s'est bien arrêté.
+
+[source,shell]
+----
+$ docker run -d centos:latest sleep 2000
+b7ff70573856f5c59f63dbacbcca715880832f8b1e74d09661050855047378a2
+
+C:\Windows\System32>docker ps
+CONTAINER ID   IMAGE           COMMAND        CREATED         STATUS         PORTS     NAMES
+b7ff70573856   centos:latest   "sleep 2000"   6 seconds ago   Up 5 seconds             awesome_wiles
+
+C:\Windows\System32>docker stop b7ff
+b7ff
+
+C:\Windows\System32>docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+----
+
+''''
+
+*11* Listez tous les conteneurs (actifs ou non) et notez les codes d'erreur de sortie des conteneurs qui ont été arrêtés précédemment. Les codes d'erreur sont indiqués dans la colonne `STATUS`. Pourquoi ces codes sont-ils différents ? Voir https://medium.com/@rahul.fiem/troubleshooting-docker-exit-codes-e9831b36797c[ce lien].
+
+* Exit Code 137: Out of Memory (OOM) or Killed
+* Exit Code 1: Generic Error
+* Exit Code 255: Unknown Error
+
+[source,shell]
+----
+$ docker ps -a
+CONTAINER ID   IMAGE           COMMAND                  CREATED              STATUS                        PORTS                                        NAMES
+b7ff70573856   centos:latest   "sleep 2000"             About a minute ago   Exited (137) 47 seconds ago                                                awesome_wiles
+4bf8a34a49ae   centos:latest   "sleep 30 -d"            4 minutes ago        Exited (1) 4 minutes ago                                                   kind_morse
+ec8b70adc4b7   centos          "/bin/bash"              7 days ago           Exited (0) 7 days ago                                                      loving_vaughan
+aed795ac3847   centos          "/bin/bash"              7 days ago           Exited (0) 7 days ago                                                      reverent_mestorf
+4a660b95f8d3   hello-world     "/hello"                 7 days ago           Exited (0) 7 days ago                                                      elastic_swartz
+d26e03ff8bd1   nginx:latest    "/docker-entrypoint.…"   4 months ago         Exited (255) 7 days ago       80/tcp                                       tp1-web-4
+467c502c9396   nginx:latest    "/docker-entrypoint.…"   4 months ago         Exited (255) 2 weeks ago      80/tcp                                       tp1-web-5
+b2b8e109d7c2   nginx:latest    "/docker-entrypoint.…"   4 months ago         Exited (255) 2 weeks ago      80/tcp                                       tp1-web-1
+56065ce19bac   nginx:latest    "/docker-entrypoint.…"   4 months ago         Exited (255) 2 weeks ago      80/tcp                                       tp1-web-3
+8b6ccee6dd75   nginx:latest    "/docker-entrypoint.…"   4 months ago         Exited (255) 2 weeks ago      80/tcp                                       tp1-web-2
+16b2e2554ef5   traefik:v3.2    "/entrypoint.sh --ap…"   4 months ago         Exited (255) 2 weeks ago      0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp   tp1-reverse-proxy-1
+010fd57643c5   monsite         "/docker-entrypoint.…"   5 months ago         Exited (255) 4 months ago     0.0.0.0:32768->80/tcp                        interesting_tharp
+----
+
+''''
+
+*12* Redémarrez le conteneur CentOS précédent (sans en relancer un nouveau). Va-t-il repartir de zéro ou bien reprendre le compteur là où il s'était arrêté et pourquoi ?
+
+* Il reprend le compteur de 0 car il redémarre.
+
+[source,shell]
+----
+$ docker start b7ff
+b7ff
+
+C:\Windows\System32>docker ps
+CONTAINER ID   IMAGE           COMMAND        CREATED          STATUS         PORTS     NAMES
+b7ff70573856   centos:latest   "sleep 2000"   11 minutes ago   Up 6 seconds             awesome_wiles
+
+----
+
+''''
+
+*13* Supprimez le dernier conteneur créé, en utilisant son nom.
+
+[source,shell]
+----
+$ docker stop awesome_wiles
+awesome_wiles
+
+C:\Windows\System32>docker rm awesome_wiles
+awesome_wiles
+
+docker ps -a
+CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS                      PORTS                                        NAMES
+4bf8a34a49ae   centos:latest   "sleep 30 -d"            36 minutes ago   Exited (1) 36 minutes ago                                                kind_morse
+ec8b70adc4b7   centos          "/bin/bash"              7 days ago       Exited (0) 7 days ago                                                    loving_vaughan
+aed795ac3847   centos          "/bin/bash"              7 days ago       Exited (0) 7 days ago                                                    reverent_mestorf
+4a660b95f8d3   hello-world     "/hello"                 7 days ago       Exited (0) 7 days ago                                                    elastic_swartz
+d26e03ff8bd1   nginx:latest    "/docker-entrypoint.…"   4 months ago     Exited (255) 7 days ago     80/tcp                                       tp1-web-4
+467c502c9396   nginx:latest    "/docker-entrypoint.…"   4 months ago     Exited (255) 2 weeks ago    80/tcp                                       tp1-web-5
+b2b8e109d7c2   nginx:latest    "/docker-entrypoint.…"   4 months ago     Exited (255) 2 weeks ago    80/tcp                                       tp1-web-1
+56065ce19bac   nginx:latest    "/docker-entrypoint.…"   4 months ago     Exited (255) 2 weeks ago    80/tcp                                       tp1-web-3
+8b6ccee6dd75   nginx:latest    "/docker-entrypoint.…"   4 months ago     Exited (255) 2 weeks ago    80/tcp                                       tp1-web-2
+16b2e2554ef5   traefik:v3.2    "/entrypoint.sh --ap…"   4 months ago     Exited (255) 2 weeks ago    0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp   tp1-reverse-proxy-1
+010fd57643c5   monsite         "/docker-entrypoint.…"   5 months ago     Exited (255) 4 months ago   0.0.0.0:32768->80/tcp                        interesting_tharp
+----
+
+''''
+
+*14* Supprimez tous les autres conteneurs, en une seule ligne de commande.
+
+[source,shell]
+----
+$ docker container prune 
+----
+
+''''
+
+*15* Listez toutes les images Docker présentes sur votre machine. Pourquoi cette liste n'est pas vide alors que l'on vient de supprimer tous les conteneurs ?
+
+* Car on a supprimer seulement les conteneurs éteint. 
+
+[source,shell]
+----
+$ docker image
+
+Usage:  docker image COMMAND
+
+Manage images
+
+Commands:
+  build       Build an image from a Dockerfile
+  history     Show the history of an image
+  import      Import the contents from a tarball to create a filesystem image
+  inspect     Display detailed information on one or more images
+  load        Load an image from a tar archive or STDIN
+  ls          List images
+  prune       Remove unused images
+  pull        Download an image from a registry
+  push        Upload an image to a registry
+  rm          Remove one or more images
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+Run 'docker image COMMAND --help' for more information on a command.
+----
+
+''''
+
+*16* Supprimez l'image `centos` de votre machine.
+
+[source,shell]
+----
+$ docker rmi centos
+Untagged: centos:latest
+Deleted: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+----
+
+''''
+**A voir dans le TP2, donc passée** +
+*17* Pourquoi plusieurs images sont-elles listées lorsque vous supprimez l'image `centos` ?
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*18* _BusyBox_ est une image Docker très légère, contenant un ensemble d'outils Unix conçus pour fonctionner dans des environnements avec des ressources limitées. _BusyBox_ intègre des versions allégées de nombreuses commandes Unix standard, telles que ls, cp, mv, rm, etc., dans un seul exécutable. Elle est souvent utilisée dans des systèmes embarqués ou diverses appliances réseau, mais est également très utile pour tester, diagnostiquer, faire de la maintenance, ou exécuter des tâches légères. Rapatriez l'image `busybox` sur votre machine, mais sans lancer de conteneur.
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*19* Lancez un conteneur _BusyBox_ qui _ping_ un site web quelconque sans s'arréter. Le conteneur doit être en mode détaché et vous devez lui donner un nom spécifique : `busybox_ping`.
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*20* On souhaite maintenant lancer, depuis l'hôte, une commande sur un conteneur qui est déjà en cours d'exécution. Depuis l'hôte, exécutez la commande `ls` dans le conteneur `busybox_ping`.
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*21* Tentez de supprimer l'image _BusyBox_ de votre machine. Pourquoi cela ne fonctionne-t-il pas ?
+
+* 
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*22* Tentez de supprimer le conteneur nommé `busybox_ping`. Pourquoi cela ne fonctionne-t-il pas ?
+
+* 
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*23* Ré-attachez-vous au conteneur `busybox_ping` pour constater qu'il travaille toujours (vous devez voir les _ping_ sur le terminal), puis forcez l'arrêt avec `Ctrl+C`.
+
+[source,shell]
+----
+$
+----
+
+''''
+
+*24* Supprimez le conteneur `busybox_ping`.
+
+[source,shell]
+----
+$
+----
+
+''''
